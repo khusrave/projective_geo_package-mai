@@ -54,7 +54,11 @@ def plot_circ(r, pos):
     x_coords, y_coords, z_coords = circ(r, pos)
     ax.plot(x_coords, y_coords, z_coords)
 
+def T1(z, a1, a2, a3):
+    return (z*(a1-a3)+a2*(a3-a1))/(z*(a1-a2)+a3*(a2-a1))
 
+def invT2(z, b1, b2, b3):
+    return (b3*(b1-b2)*z+b2*(b3-b1))/(z*(b1-b2)+b3*(b1-b2))
 
 
 ax = plt.figure().add_subplot(projection='3d')
