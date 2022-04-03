@@ -1,3 +1,4 @@
+from cProfile import label
 from importlib_metadata import NullFinder
 import matplotlib.pyplot as plt
 import numpy as np
@@ -86,6 +87,32 @@ def invT2(Z, B1, B2, B3):
     b3 = vecCom(B3)
     return comVec((b3*(b1-b2)*z+b2*(b3-b1))/(z*(b1-b2)+b3*(b1-b2)))
 
+def line(dir):
+    l = np.linspace(-12, 12, 1000)
+    return dir[0]*l, dir[1]*l, [0]*1000
+
+def plot_line(dir):
+    xs, ys, zs = line(dir)
+    ax.plot(xs, ys, zs)
+
+def plot_stereo(x_coords, y_coords, plot_label):
+    # ax = plt.figure().add_subplot(projection='3d')
+    x_coords, y_coords, z_coords = eval_stereo_list(x_coords, y_coords )
+    ax.plot(x_coords, y_coords, z_coords, label=plot_label)
+
+def plot_stere_circ(r, pos, label):
+    xs, ys, _ = circ(r, pos)
+    plot_stereo(xs, ys, label)
+    
+def plot_stere_line(dir, label):
+    xs, ys, _ = line(dir)
+    plot_stereo(xs, ys, label)
+
+def plot_sphere(r, pos):
+    x_sph, y_sph, z_sph = sphere(r, pos)
+    ax.plot_surface(x_sph, y_sph, z_sph, alpha=0.3)
+
+
 A1 = [1,2]
 A2 = [2,3]
 A3 = [4,5]
@@ -96,22 +123,32 @@ B3 = [9,10]
 
 ax = plt.figure().add_subplot(projection='3d')
 # Plot of the Stereographic projection of the circle 
-x_coords, y_coords, z_coords = eval_stereo_list(circ(1,[1,1])[0], circ(1,[1,1])[1] )
-# The unitary sphere
-x_sphere, y_sphere, z_sphere = sphere(1,[0,0,0])
-# Transform the cirlce in the plane
-x_t, y_t, z_t = mob_transf(circ(1,[1,1])[0], circ(1,[1,1])[1] )
-# Transformation projected 
-x_st, y_st, z_st = eval_stereo_list(x_t, y_t )
+# x_coords, y_coords, z_coords = eval_stereo_list(circ(1,[1,1])[0], circ(1,[1,1])[1] )
+# # The unitary sphere
+# x_sphere, y_sphere, z_sphere = sphere(1,[0,0,0])
+# # Transform the cirlce in the plane
+# x_t, y_t, z_t = mob_transf(circ(1,[1,1])[0], circ(1,[1,1])[1] )
+# # Transformation projected 
+# x_st, y_st, z_st = eval_stereo_list(x_t, y_t )
+# # Create a line 
+# xl, yl, zl = line([1,1])
+# # Stereographic projection of the line
+# xsl, ysl, zsl = eval_stereo_list(xl, yl )
 
-ax.plot_surface(x_sphere, y_sphere, z_sphere, alpha=0.3)
-ax.plot(x_coords, y_coords, z_coords , label='Stereo Proj')
-ax.plot(x_st, y_st, z_st , label='Transformation R2')
-ax.plot(x_t, y_t, z_t , label='Transformation R3')
+# ax.plot_surface(x_sphere, y_sphere, z_sphere, alpha=0.3)
+# ax.plot(x_coords, y_coords, z_coords , label='Stereo Proj')
+# ax.plot(xl, yl, zl , label='Transformation R2')
+# ax.plot(xsl, ysl, zsl , label='Transformation R3')
 # Plot the circle in the plane
+plot_sphere(1,[0,0,0])
 plot_circ(1,[1,1])
-
+plot_line([1,1])
+plot_stere_circ(1, [1,1], "Stero Circle")
+plot_stere_line([1,1], "Stero Line")
+ax.axes.set_xlim3d(left=-1.5, right=1.5) 
+ax.axes.set_ylim3d(bottom=-1.5, top=1.5) 
+ax.axes.set_zlim3d(bottom=-1.5, top=1.5)
 ax.legend()
-ax.set_box_aspect((1, 1, 0.6))
+ax.set_box_aspect((1, 1, 1))
 
 plt.show()
