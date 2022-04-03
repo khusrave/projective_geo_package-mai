@@ -49,18 +49,6 @@ def eval_stereo_list(x_coords, y_coords):
         lstz.append(zs)
     return lstx, lsty, lstz
 
-def mob_transf(x_coords, y_coords):
-    n = len(x_coords)
-    lstx = []
-    lsty = []
-    
-    for i in range(n):
-        [xs, ys] = invT2( T1([x_coords[i], y_coords[i]], A1, A2, A3 ), B1, B2, B3 )
-        lstx.append(xs)
-        lsty.append(ys)
-        
-    lstz = [0]*n
-    return lstx, lsty, lstz
 
 def plot_circ(r, pos):
     # ax = plt.figure().add_subplot(projection='3d')
@@ -87,6 +75,19 @@ def invT2(Z, B1, B2, B3):
     b3 = vecCom(B3)
     return comVec((b3*(b1-b2)*z+b2*(b3-b1))/(z*(b1-b2)+b3*(b1-b2)))
 
+def mob_transf(x_coords, y_coords):
+    n = len(x_coords)
+    lstx = []
+    lsty = []
+    
+    for i in range(n):
+        [xs, ys] = invT2( T1([x_coords[i], y_coords[i]], A1, A2, A3 ), B1, B2, B3 )
+        lstx.append(xs)
+        lsty.append(ys)
+        
+    lstz = [0]*n
+    return lstx, lsty, lstz
+
 def line(dir):
     l = np.linspace(-12, 12, 1000)
     return dir[0]*l, dir[1]*l, [0]*1000
@@ -95,7 +96,7 @@ def plot_line(dir):
     xs, ys, zs = line(dir)
     ax.plot(xs, ys, zs)
 
-def plot_stereo(x_coords, y_coords, plot_label):
+def plot_stereo(x_coords, y_coords, plot_label=''):
     # ax = plt.figure().add_subplot(projection='3d')
     x_coords, y_coords, z_coords = eval_stereo_list(x_coords, y_coords )
     ax.plot(x_coords, y_coords, z_coords, label=plot_label)
@@ -112,6 +113,40 @@ def plot_sphere(r, pos):
     x_sph, y_sph, z_sph = sphere(r, pos)
     ax.plot_surface(x_sph, y_sph, z_sph, alpha=0.3)
 
+def Lat_circ(n, r_i, r_f):
+    radius = np.linspace(r_i, r_f, n)
+    circles = [] 
+    for r in radius:
+        circles.append(circ(r, [0,0]))
+    return circles
+
+def Long_circ(n):
+    angles = np.linspace(0, 2*np.pi, n)
+    lines = [] 
+    for theta in angles:
+        lines.append(line([np.cos(theta), np.sin(theta)]))
+    return lines
+
+def eval_plots_stero(ls_geo_objs):
+    for geo_obj in ls_geo_objs:
+        xs = geo_obj[0]
+        ys = geo_obj[1]
+        plot_stereo(xs, ys)
+
+def eval_plots(ls_geo_objs):
+    for geo_obj in ls_geo_objs:
+        xs = geo_obj[0]
+        ys = geo_obj[1]
+        zs = geo_obj[2]
+        ax.plot(xs, ys, zs)
+
+def eval_trasn(ls_geo_objs):
+    for geo_obj in ls_geo_objs:
+        xs = geo_obj[0]
+        ys = geo_obj[1]
+        xt, yt, zt = mob_transf(xs, ys)
+        plot_stereo(xt, yt)
+
 
 A1 = [1,2]
 A2 = [2,3]
@@ -122,29 +157,18 @@ B3 = [9,10]
 
 
 ax = plt.figure().add_subplot(projection='3d')
-# Plot of the Stereographic projection of the circle 
-# x_coords, y_coords, z_coords = eval_stereo_list(circ(1,[1,1])[0], circ(1,[1,1])[1] )
-# # The unitary sphere
-# x_sphere, y_sphere, z_sphere = sphere(1,[0,0,0])
-# # Transform the cirlce in the plane
-# x_t, y_t, z_t = mob_transf(circ(1,[1,1])[0], circ(1,[1,1])[1] )
-# # Transformation projected 
-# x_st, y_st, z_st = eval_stereo_list(x_t, y_t )
-# # Create a line 
-# xl, yl, zl = line([1,1])
-# # Stereographic projection of the line
-# xsl, ysl, zsl = eval_stereo_list(xl, yl )
-
-# ax.plot_surface(x_sphere, y_sphere, z_sphere, alpha=0.3)
-# ax.plot(x_coords, y_coords, z_coords , label='Stereo Proj')
-# ax.plot(xl, yl, zl , label='Transformation R2')
-# ax.plot(xsl, ysl, zsl , label='Transformation R3')
-# Plot the circle in the plane
-plot_sphere(1,[0,0,0])
-plot_circ(1,[1,1])
-plot_line([1,1])
-plot_stere_circ(1, [1,1], "Stero Circle")
-plot_stere_line([1,1], "Stero Line")
+# Plots 
+# plot_sphere(1,[0,0,0])
+# plot_circ(1,[1,1])
+# plot_line([1,1])
+# plot_stere_circ(1, [1,1], "Stero Circle")
+# plot_stere_line([1,1], "Stero Line")
+lat_circles = Lat_circ(10, 0.5, 2)
+long_circles = Long_circ(10)
+eval_plots_stero(lat_circles)
+#eval_plots_stero(long_circles)
+eval_trasn(lat_circles)
+# Definition of the range of the box
 ax.axes.set_xlim3d(left=-1.5, right=1.5) 
 ax.axes.set_ylim3d(bottom=-1.5, top=1.5) 
 ax.axes.set_zlim3d(bottom=-1.5, top=1.5)
