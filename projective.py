@@ -168,15 +168,15 @@ def eval_plots_stero(ls_geo_objs):
         ys = geo_obj[1]
         plot_stereo(xs, ys)
 
-def eval_plots(ls_geo_objs):
+def eval_plots(ls_geo_objs, cl='black'):
     """ Function that plot a list of geometric objects """
     for geo_obj in ls_geo_objs:
         xs = geo_obj[0]
         ys = geo_obj[1]
         zs = geo_obj[2]
-        ax.plot(xs, ys, zs)
+        ax.plot(xs, ys, zs, color= cl)
 
-def eval_trasn(ls_geo_objs, color="red"):
+def eval_transS(ls_geo_objs, color="red"):
     """ Function that take a list of geometric objects define on R^2 
     apply a mobius transformation and plot the inverse stereographic projection of them"""
     for geo_obj in ls_geo_objs:
@@ -184,6 +184,17 @@ def eval_trasn(ls_geo_objs, color="red"):
         ys = geo_obj[1]
         xt, yt, zt = mob_transf(xs, ys)
         plot_stereo(x_coords=xt, y_coords=yt, cl=color)
+
+def eval_transPlane(ls_geo_objs, cl="red"):
+    """ Function that take a list of geometric objects define on R^2 
+    apply a mobius transformation and plot the inverse stereographic projection of them"""
+    for geo_obj in ls_geo_objs:
+        xs = geo_obj[0]
+        ys = geo_obj[1]
+        n = len(xs)
+        xt, yt, _ = mob_transf(xs, ys)
+        ax.plot(xt, yt, [0]*n, color=cl)
+
 
 
 A1 = [1,2]
@@ -208,11 +219,13 @@ ax = plt.figure().add_subplot(projection='3d')
 # plot_stere_circ(1, [1,1], "Stero Circle")
 # plot_stere_line([1,1], "Stero Line")
 lat_circles = Lat_circ(10, 0.5, 10)
-long_circles = Long_circ(10)
+long_circles = Long_circ(20)
 #eval_plots_stero(lat_circles)
-eval_plots_stero(long_circles)
+eval_plots(long_circles)
+eval_plots(lat_circles, 'blue')
 #eval_trasn(lat_circles, 'black')
-eval_trasn(long_circles, darkred)
+eval_transPlane(long_circles, darkred)
+eval_transPlane(lat_circles, 'orange')
 # Definition of the range of the box
 ax.axes.set_xlim3d(left=-1.5, right=1.5) 
 ax.axes.set_ylim3d(bottom=-1.5, top=1.5) 
