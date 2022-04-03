@@ -60,6 +60,12 @@ def T1(z, a1, a2, a3):
 def invT2(z, b1, b2, b3):
     return (b3*(b1-b2)*z+b2*(b3-b1))/(z*(b1-b2)+b3*(b1-b2))
 
+def vecCom(vec):
+    return complex(vec[0], vec[1])
+
+def comVec(com):
+    return [np.real(com), np.imag(com)]
+
 
 ax = plt.figure().add_subplot(projection='3d')
 x_coords, y_coords, z_coords = eval_stereo_list(circ(1,[1,1])[0], circ(1,[1,1])[1] )
