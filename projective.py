@@ -239,9 +239,10 @@ def vecCom(vec):
 def comVec(com):
     return [np.real(com), np.imag(com)]
 
-fig = plt.figure(figsize=plt.figaspect(2.))
-ax2d = fig.add_subplot(2, 1, 1)
-ax = fig.add_subplot(2, 1, 2, projection='3d')
+fig = plt.figure(figsize=plt.figaspect(1.))
+fig2 = plt.figure(figsize=plt.figaspect(1.))
+ax2d = fig2.add_subplot()
+ax = fig.add_subplot(projection='3d')
 # Plots 
 # plot_sphere(1,[0,0,0])
 # plot_circ(1,[1,1])
@@ -252,16 +253,21 @@ lat_circles = Lat_circ(10, 0.5, 10)
 long_circles = Long_circ(20)
 t1_lat_circles = list(map(lambda geo: mob_transf_T1(geo[0], geo[1]), lat_circles ))
 t2_lat_circles = list(map(lambda geo: mob_transf_invT2(geo[0], geo[1]), t1_lat_circles ))
-#eval_plots_stero(lat_circles)
-eval_plots(lat_circles,cl1='red', cl2='red' )
-#eval_plots(lat_circles, cl1='blue', cl2='purple')
-eval_plots(t1_lat_circles, cl1='purple', cl2='purple')
-eval_plots(t2_lat_circles, cl1='green', cl2='green')
-#eval_plots(lat_circles, 'blue')
-#eval_trasn(lat_circles, 'black')
-#eval_transPlane(long_circles, darkred)
-#eval_transPlane(lat_circles, 'orange')
-# Definition of the range of the box
+
+long_circles = Long_circ(20)
+t1_long_circles = list(map(lambda geo: mob_transf_T1(geo[0], geo[1]), long_circles ))
+t2_long_circles = list(map(lambda geo: mob_transf_invT2(geo[0], geo[1]), t1_long_circles ))
+
+
+eval_plots(lat_circles,cl1='blue', cl2='blue' )
+eval_plots(t1_lat_circles, cl1='black', cl2='black')
+eval_plots(t2_lat_circles, cl1='gray', cl2='gray')
+#eval_plots(lat_circles,cl1='red', cl2='red' )
+#eval_plots(t1_lat_circles, cl1='purple', cl2='purple')
+#eval_plots(t2_lat_circles, cl1='green', cl2='green')
+plot_sphere(1,[0,0,0])
+
+
 ax2d.axes.set_xlim(left=-2, right=2) 
 ax2d.axes.set_ylim(bottom=-2, top=2) 
 ax.axes.set_xlim3d(left=-1.5, right=1.5) 
