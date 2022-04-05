@@ -253,7 +253,7 @@ long_circles = Long_circ(20)
 t1_lat_circles = list(map(lambda geo: mob_transf_T1(geo[0], geo[1]), lat_circles ))
 t2_lat_circles = list(map(lambda geo: mob_transf_invT2(geo[0], geo[1]), t1_lat_circles ))
 #eval_plots_stero(lat_circles)
-eval_plots(lat_circles,cl1='blue', cl2='red' )
+eval_plots(lat_circles,cl1='red', cl2='red' )
 #eval_plots(lat_circles, cl1='blue', cl2='purple')
 eval_plots(t1_lat_circles, cl1='purple', cl2='purple')
 eval_plots(t2_lat_circles, cl1='green', cl2='green')
@@ -279,7 +279,7 @@ custom_lines2 = [Line2D([0], [0], color='black', lw=4),
                 ]
 
 ax2d.legend(custom_lines1,["Latitute","T1", "InvT2"], loc="upper right")
-ax.legend(custom_lines2,["Latitute","T1", "InvT2"], loc="upper right")
+ax.legend(custom_lines1,["Latitute","T1", "InvT2"], loc="upper right")
 
 
 
