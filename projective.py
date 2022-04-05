@@ -129,7 +129,7 @@ def mob_transf_Comp_ster(x_coords, y_coords):
 
 def line(dir):
     """ Function to define a line """
-    l = np.linspace(-50, 50, 1000)
+    l = np.linspace(-200, 200, 1000)
     return dir[0]*l, dir[1]*l, [0]*1000
 
 def plot_line(dir):
@@ -163,7 +163,7 @@ def plot_sphere(r, pos):
     # Points of the sphere
     x_sph, y_sph, z_sph = sphere(r, pos)
     # Plot the sphere
-    ax.plot_surface(x_sph, y_sph, z_sph, alpha=0.3)
+    ax.plot_surface(x_sph, y_sph, z_sph, alpha=0.3, color='white')
 
 def Lat_circ(n, r_i, r_f):
     """Function to create a list of circles that correspond to latitude constanc circles"""
@@ -250,18 +250,19 @@ ax = fig.add_subplot(projection='3d')
 # plot_stere_circ(1, [1,1], "Stero Circle")
 # plot_stere_line([1,1], "Stero Line")
 lat_circles = Lat_circ(10, 0.5, 10)
-long_circles = Long_circ(20)
+
 t1_lat_circles = list(map(lambda geo: mob_transf_T1(geo[0], geo[1]), lat_circles ))
 t2_lat_circles = list(map(lambda geo: mob_transf_invT2(geo[0], geo[1]), t1_lat_circles ))
 
-long_circles = Long_circ(20)
+long_circles = Long_circ(10)
 t1_long_circles = list(map(lambda geo: mob_transf_T1(geo[0], geo[1]), long_circles ))
 t2_long_circles = list(map(lambda geo: mob_transf_invT2(geo[0], geo[1]), t1_long_circles ))
 
 
-eval_plots(lat_circles,cl1='blue', cl2='blue' )
-eval_plots(t1_lat_circles, cl1='black', cl2='black')
-eval_plots(t2_lat_circles, cl1='gray', cl2='gray')
+eval_plots(long_circles,cl1='blue', cl2='blue' )
+eval_plots(lat_circles,cl1='purple', cl2='purple' )
+eval_plots(t2_lat_circles, cl1='black', cl2='black')
+eval_plots(t2_long_circles, cl1='green', cl2='green')
 #eval_plots(lat_circles,cl1='red', cl2='red' )
 #eval_plots(t1_lat_circles, cl1='purple', cl2='purple')
 #eval_plots(t2_lat_circles, cl1='green', cl2='green')
@@ -279,13 +280,19 @@ custom_lines1 = [Line2D([0], [0], color='red', lw=4),
                 Line2D([0], [0], color='purple', lw=4),
                 Line2D([0], [0], color='green', lw=4)]
             
-custom_lines2 = [Line2D([0], [0], color='black', lw=4),
-                Line2D([0], [0], color='blue', lw=4),
-                Line2D([0], [0], color='gray', lw=4)
+custom_lines2 = [Line2D([0], [0], color='blue', lw=4),
+                Line2D([0], [0], color='black', lw=4),
+                Line2D([0], [0], color='red', lw=4)
+                ]
+            
+custom_lines3 = [Line2D([0], [0], color='blue', lw=4),
+                Line2D([0], [0], color='purple', lw=4),
+                Line2D([0], [0], color='black', lw=4),
+                Line2D([0], [0], color='green', lw=4)
                 ]
 
-ax2d.legend(custom_lines1,["Latitute","T1", "InvT2"], loc="upper right")
-ax.legend(custom_lines1,["Latitute","T1", "InvT2"], loc="upper right")
+ax2d.legend(custom_lines3,["Longituted C","Latituted C", "Transf Long", "Transf Lat"], loc="upper right")
+ax.legend(custom_lines3,["Longituted C","Latituted C", "Transf Long", "Transf Lat"], loc="upper right")
 
 
 
