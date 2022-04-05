@@ -250,9 +250,13 @@ ax = fig.add_subplot(2, 1, 2, projection='3d')
 # plot_stere_line([1,1], "Stero Line")
 lat_circles = Lat_circ(10, 0.5, 10)
 long_circles = Long_circ(20)
+t1_lat_circles = list(map(lambda geo: mob_transf_T1(geo[0], geo[1]), lat_circles ))
+t2_lat_circles = list(map(lambda geo: mob_transf_invT2(geo[0], geo[1]), t1_lat_circles ))
 #eval_plots_stero(lat_circles)
-eval_plots(long_circles)
-eval_plots(lat_circles, cl1='blue', cl2='purple')
+eval_plots(lat_circles)
+#eval_plots(lat_circles, cl1='blue', cl2='purple')
+eval_plots(t1_lat_circles, cl1='blue', cl2='purple')
+eval_plots(t2_lat_circles, cl1='gray', cl2='green')
 #eval_plots(lat_circles, 'blue')
 #eval_trasn(lat_circles, 'black')
 #eval_transPlane(long_circles, darkred)
@@ -266,13 +270,16 @@ ax.axes.set_zlim3d(bottom=-1.5, top=1.5)
 ax.set_box_aspect((1, 1, 1))
 
 custom_lines1 = [Line2D([0], [0], color='red', lw=4),
-                Line2D([0], [0], color='purple', lw=4)]
+                Line2D([0], [0], color='purple', lw=4),
+                Line2D([0], [0], color='green', lw=4)]
             
 custom_lines2 = [Line2D([0], [0], color='black', lw=4),
-                Line2D([0], [0], color='blue', lw=4)]
+                Line2D([0], [0], color='blue', lw=4),
+                Line2D([0], [0], color='gray', lw=4)
+                ]
 
-ax2d.legend(custom_lines1,["Lat","Long"], loc="upper right")
-ax.legend(custom_lines2,["Lat","Long"], loc="upper right")
+ax2d.legend(custom_lines1,["Latitute","T1", "InvT2"], loc="upper right")
+ax.legend(custom_lines2,["Latitute","T1", "InvT2"], loc="upper right")
 
 
 
