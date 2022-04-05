@@ -1,5 +1,6 @@
 from ctypes.wintypes import RGB
 import matplotlib.pyplot as plt
+from matplotlib.lines import Line2D
 import numpy as np
 
 def RGB(r, g ,b):
@@ -86,18 +87,44 @@ def invT2(Z, B1, B2, B3):
     b3 = vecCom(B3)
     return comVec((b3*(b1-b2)*z+b2*(b3-b1))/(z*(b1-b2)+b3*(b1-b2)))
 
-def mob_transf(x_coords, y_coords):
+def mob_transf_T1(x_coords, y_coords):
     """ Function to apply a Mobius transformation define by six points to a set of points """
     n = len(x_coords)
     lstx = []
     lsty = []
     
     for i in range(n):
-        [xs, ys] = invT2( T1([x_coords[i], y_coords[i]], A1, A2, A3 ), B1, B2, B3 )
+        [xs, ys] = T1([x_coords[i], y_coords[i]], A1, A2, A3 )
         lstx.append(xs)
         lsty.append(ys)
-        
     lstz = [0]*n
+    return lstx, lsty, lstz
+
+def mob_transf_invT2(x_coords, y_coords):
+    """ Function to apply a Mobius transformation define by six points to a set of points """
+    n = len(x_coords)
+    lstx = []
+    lsty = []
+    
+    for i in range(n):
+        [xs, ys] = invT2([x_coords[i], y_coords[i]], B1, B2, B3 )
+        lstx.append(xs)
+        lsty.append(ys)
+    lstz = [0]*n
+    return lstx, lsty, lstz
+
+
+def mob_transf_Comp(x_coords, y_coords):
+    """ Function to apply a Mobius transformation define by six points to a set of points """
+    t1x, t1y, _ = mob_transf_T1(x_coords, y_coords)
+    lstx, lsty, lstz = mob_transf_invT2(t1x, t1y)
+
+    return lstx, lsty, lstz
+
+def mob_transf_Comp_ster(x_coords, y_coords):
+    """ Function to apply a Mobius transformation define by six points to a set of points """
+    t1x, t1y, _ = mob_transf_T1(x_coords, y_coords)
+    lstx, lsty, lstz = mob_transf_invT2(t1x, t1y)
     return lstx, lsty, lstz
 
 def line(dir):
@@ -160,21 +187,23 @@ def Long_circ(n):
         lines.append(line([np.cos(theta), np.sin(theta)]))
     return lines
 
-def eval_plots_stero(ls_geo_objs):
-    """ Function that take a list of geometric objects define on R^2 and plot the inverse stereographic projection
-    of each objects """
-    for geo_obj in ls_geo_objs:
-        xs = geo_obj[0]
-        ys = geo_obj[1]
-        plot_stereo(xs, ys)
+def plot_3d(xs,ys,zs, lbl='', cl='blue'):
+    ax.plot(xs, ys, zs, label= lbl, color= cl)
 
-def eval_plots(ls_geo_objs, cl='black'):
+def plot_2d(xs,ys, lbl='',  cl='blue'):
+    ax2d.plot(xs, ys, label= lbl, color= cl)
+
+
+def eval_plots(ls_geo_objs, cl1='black', cl2='red'):
     """ Function that plot a list of geometric objects """
     for geo_obj in ls_geo_objs:
-        xs = geo_obj[0]
-        ys = geo_obj[1]
-        zs = geo_obj[2]
-        ax.plot(xs, ys, zs, color= cl)
+        xls = geo_obj[0]
+        yls = geo_obj[1]
+        zls = geo_obj[2]
+        x_ster, y_ster, z_ster = eval_stereo_list(xls, yls)
+        plot_3d(xs=x_ster, ys=y_ster, zs=z_ster, cl=cl1 )
+        plot_2d(xs=xls, ys=yls, cl=cl2 )
+
 
 def eval_transS(ls_geo_objs, color="red"):
     """ Function that take a list of geometric objects define on R^2 
@@ -182,7 +211,7 @@ def eval_transS(ls_geo_objs, color="red"):
     for geo_obj in ls_geo_objs:
         xs = geo_obj[0]
         ys = geo_obj[1]
-        xt, yt, zt = mob_transf(xs, ys)
+        xt, yt, zt = mob_transf_Comp(xs, ys)
         plot_stereo(x_coords=xt, y_coords=yt, cl=color)
 
 def eval_transPlane(ls_geo_objs, cl="red"):
@@ -192,7 +221,7 @@ def eval_transPlane(ls_geo_objs, cl="red"):
         xs = geo_obj[0]
         ys = geo_obj[1]
         n = len(xs)
-        xt, yt, _ = mob_transf(xs, ys)
+        xt, yt, _ = mob_transf_Comp(xs, ys)
         ax.plot(xt, yt, [0]*n, color=cl)
 
 
@@ -210,8 +239,9 @@ def vecCom(vec):
 def comVec(com):
     return [np.real(com), np.imag(com)]
 
-
-ax = plt.figure().add_subplot(projection='3d')
+fig = plt.figure(figsize=plt.figaspect(2.))
+ax2d = fig.add_subplot(2, 1, 1)
+ax = fig.add_subplot(2, 1, 2, projection='3d')
 # Plots 
 # plot_sphere(1,[0,0,0])
 # plot_circ(1,[1,1])
@@ -222,15 +252,29 @@ lat_circles = Lat_circ(10, 0.5, 10)
 long_circles = Long_circ(20)
 #eval_plots_stero(lat_circles)
 eval_plots(long_circles)
-eval_plots(lat_circles, 'blue')
+eval_plots(lat_circles, cl1='blue', cl2='purple')
+#eval_plots(lat_circles, 'blue')
 #eval_trasn(lat_circles, 'black')
-eval_transPlane(long_circles, darkred)
-eval_transPlane(lat_circles, 'orange')
+#eval_transPlane(long_circles, darkred)
+#eval_transPlane(lat_circles, 'orange')
 # Definition of the range of the box
+ax2d.axes.set_xlim(left=-2, right=2) 
+ax2d.axes.set_ylim(bottom=-2, top=2) 
 ax.axes.set_xlim3d(left=-1.5, right=1.5) 
 ax.axes.set_ylim3d(bottom=-1.5, top=1.5) 
 ax.axes.set_zlim3d(bottom=-1.5, top=1.5)
-ax.legend()
 ax.set_box_aspect((1, 1, 1))
+
+custom_lines1 = [Line2D([0], [0], color='red', lw=4),
+                Line2D([0], [0], color='purple', lw=4)]
+            
+custom_lines2 = [Line2D([0], [0], color='black', lw=4),
+                Line2D([0], [0], color='blue', lw=4)]
+
+ax2d.legend(custom_lines1,["Lat","Long"], loc="upper right")
+ax.legend(custom_lines2,["Lat","Long"], loc="upper right")
+
+
+
 
 plt.show()
