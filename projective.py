@@ -1,6 +1,7 @@
 from cProfile import run
 from ctypes.wintypes import RGB
 from symtable import Symbol
+from attr import evolve
 import matplotlib.pyplot as plt
 from matplotlib.lines import Line2D
 import numpy as np
@@ -277,8 +278,8 @@ def center_c(p1, p2, p3):
     cd = (temp - p3[0] * p3[0] - p3[1] * p3[1]) / 2
     det = (p1[0] - p2[0]) * (p2[1] - p3[1]) - (p2[0] - p3[0]) * (p1[1] - p2[1])
 
-    if abs(det) < 1.0e-6:
-        return (None, np.inf)
+    if abs(det) > 1.0e-6:
+       return None
 
     # Center of circle
     cx = (bc*(p2[1] - p3[1]) - cd*(p1[1] - p2[1])) / det
@@ -288,9 +289,12 @@ def center_c(p1, p2, p3):
 
 def evalue(lst):
     eval = []
-    for i in range(1, lst - 1):
+    for i in range(1, len(lst) - 1):
+        
         center = center_c(lst[i-1], lst[i], lst[i+1])
-        eval.append(center)
+        if center != None:
+            eval.append(center)
+    
     return eval
 
 def eval_func_ls(func, ti, tf, n, *args):
@@ -315,7 +319,7 @@ def vecCom(vec):
 def comVec(com):
     return [np.real(com), np.imag(com)]
 
-fig = plt.figure(figsize=plt.figaspect(1.))
+
 fig2 = plt.figure(figsize=plt.figaspect(1.))
 ax2d = fig2.add_subplot()
 # ax = fig.add_subplot(projection='3d')
@@ -380,8 +384,32 @@ ax2d = fig2.add_subplot()
 # ax2d.set_ylim(-10,10)
 # plt.show()
 a, b, t = sym.symbols('a b t')
-x = t ** 2
-y = t
 
-ls = eval_func_ls(curve_ofset, 1, 2, 5, x, t, 1)
-print(ls)
+# Rational curve in IC2
+x = (t ** 2 + t**4)/(t**3+2*t+t**2)
+y = (t**3+2*t+t**2)/(t ** 2 + t**4)
+
+# List of offsets
+ls_offsets = [-1,-2,-5,1,2,3]
+# Initial t0
+ini_t  = 0.1
+# Fintal tf
+final_t = 12
+# Number of points between t0 and tf
+n = 50 
+
+pts = np.array(eval_func_ls(curve, ini_t, final_t, n, x, y))
+pts_off = np.array(list(map( lambda d: np.array(eval_func_ls(curve_ofset, ini_t, final_t, n, x, y, d)), ls_offsets )))
+#pts_off =  np.array(eval_func_ls(curve_ofset, 0.1, 12, 50, x, y, 2))
+pts_evo = np.array(evalue(pts))
+
+
+ax2d.plot(pts[:,0],pts[:,1])
+for i in range(len(pts_off)):
+
+    ax2d.plot(pts_off[i][:,0],pts_off[i][:,1])
+
+ax2d.plot(pts_evo[:,0],pts_evo[:,1])
+ax2d.set_xlim(-5,5)
+ax2d.set_ylim(-5,5)
+plt.show()
