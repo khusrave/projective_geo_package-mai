@@ -253,6 +253,47 @@ def curve(x, y):
     cy = (hp - h * n1p) / (n2 * n1p - n2p)
     return cx, cy
 
+def curve_ofset(x, y, d):
+    n1 = 2 * x / (1 + x * x)
+    n2 = (1-  x * x) / (1 + x * x)
+    h = 2 * (y+(d/2)*(1+x**2)) / (1 + x * x)
+    dx = sym.diff(x, t)
+    dy = sym.diff(y, t)
+    n1p = sym.diff(n1, t)
+    n2p = sym.diff(n2, t)
+    hp = sym.diff(h, t)
+    cx = (hp - h * n2p) / (n1 * n2p - n1p)
+    cy = (hp - h * n1p) / (n2 * n1p - n2p)
+    return cx, cy
+
+def center_c(p1, p2, p3):
+    """
+    Returns the center and radius of the circle passing the given 3 points.
+    In case the 3 points form a line, returns (None, infinity).
+    """
+    temp = p2[0] * p2[0] + p2[1] * p2[1]
+    bc = (p1[0] * p1[0] + p1[1] * p1[1] - temp) / 2
+    cd = (temp - p3[0] * p3[0] - p3[1] * p3[1]) / 2
+    det = (p1[0] - p2[0]) * (p2[1] - p3[1]) - (p2[0] - p3[0]) * (p1[1] - p2[1])
+
+    if abs(det) < 1.0e-6:
+        return (None, np.inf)
+
+    # Center of circle
+    cx = (bc*(p2[1] - p3[1]) - cd*(p1[1] - p2[1])) / det
+    cy = ((p1[0] - p2[0]) * cd - (p2[0] - p3[0]) * bc) / det
+
+    radius = np.sqrt((cx - p1[0])**2 + (cy - p1[1])**2)
+    return cx, cy
+
+def evalue(lst):
+    eval = []
+    for i in range(1, lst - 1):
+        center = center_c(lst[i-1], lst[i], lst[i+1])
+        eval.append(center)
+    return eval
+
+
 
 A1 = [1,2]
 A2 = [2,3]
@@ -334,4 +375,4 @@ ax2d = fig2.add_subplot()
 a, b, t = sym.symbols('a b t')
 x = t ** 2
 y = t
-print(curve(x, y)[0].subs(t, 0.5), curve(x, y)[1].subs(t, 0.5))
+print(curve_ofset(x, y, 1)[0].subs(t, 0.5), curve_ofset(x, y, 1)[1].subs(t, 0.5))
