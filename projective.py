@@ -1,7 +1,9 @@
 from ctypes.wintypes import RGB
+from symtable import Symbol
 import matplotlib.pyplot as plt
 from matplotlib.lines import Line2D
 import numpy as np
+import sympy as sym
 
 def RGB(r, g ,b):
     """ Function to normalize RGB """
@@ -224,6 +226,32 @@ def eval_transPlane(ls_geo_objs, cl="red"):
         xt, yt, _ = mob_transf_Comp(xs, ys)
         ax.plot(xt, yt, [0]*n, color=cl)
 
+def lag_to_bluchke(x,y):
+    x_l = 2 * x / (1 + x * x)
+    y_l = (1-  x * x) / (1 + x * x)
+    z_l = 2 * y / (1 + x * x)
+    return [x_l, y_l, z_l]
+
+def bluchke_to_euc(n1,n2,h):
+    x_e = np.linspace(-100, 100, 100)
+    y_e = (-n2 * x_e - h) / n1
+    return [x_e, y_e]
+
+def func(t):
+    return [t^2 + t, t^4 + t + 2]
+
+def curve(x, y):
+    n1 = 2 * x / (1 + x * x)
+    n2 = (1-  x * x) / (1 + x * x)
+    h = 2 * y / (1 + x * x)
+    dx = sym.diff(x, t)
+    dy = sym.diff(y, t)
+    n1p = (2 - 2 * x ** 2) * dx / (1 + x ** 2) ** 2
+    n2p = (-4 * x) * dx / (1 + x ** 2) ** 2
+    hp = (2* y * dy * (1 + x ** 2) - 2 * x * dx * 2 * y) / (1 + x ** 2) ** 2
+    cx = (hp - h * n2p) / (n1 * n2p - n1p)
+    cy = (hp - h * n1p) / (n2 * n1p - n2p)
+    return cx, cy
 
 
 A1 = [1,2]
@@ -242,59 +270,68 @@ def comVec(com):
 fig = plt.figure(figsize=plt.figaspect(1.))
 fig2 = plt.figure(figsize=plt.figaspect(1.))
 ax2d = fig2.add_subplot()
-ax = fig.add_subplot(projection='3d')
-# Plots 
+# ax = fig.add_subplot(projection='3d')
+# # Plots 
+# # plot_sphere(1,[0,0,0])
+# # plot_circ(1,[1,1])
+# # plot_line([1,1])
+# # plot_stere_circ(1, [1,1], "Stero Circle")
+# # plot_stere_line([1,1], "Stero Line")
+# lat_circles = Lat_circ(10, 0.5, 10)
+
+# t1_lat_circles = list(map(lambda geo: mob_transf_T1(geo[0], geo[1]), lat_circles ))
+# t2_lat_circles = list(map(lambda geo: mob_transf_invT2(geo[0], geo[1]), t1_lat_circles ))
+
+# long_circles = Long_circ(10)
+# t1_long_circles = list(map(lambda geo: mob_transf_T1(geo[0], geo[1]), long_circles ))
+# t2_long_circles = list(map(lambda geo: mob_transf_invT2(geo[0], geo[1]), t1_long_circles ))
+
+
+# eval_plots(long_circles,cl1='blue', cl2='blue' )
+# eval_plots(lat_circles,cl1='purple', cl2='purple' )
+# eval_plots(t2_lat_circles, cl1='black', cl2='black')
+# eval_plots(t2_long_circles, cl1='green', cl2='green')
+# #eval_plots(lat_circles,cl1='red', cl2='red' )
+# #eval_plots(t1_lat_circles, cl1='purple', cl2='purple')
+# #eval_plots(t2_lat_circles, cl1='green', cl2='green')
 # plot_sphere(1,[0,0,0])
-# plot_circ(1,[1,1])
-# plot_line([1,1])
-# plot_stere_circ(1, [1,1], "Stero Circle")
-# plot_stere_line([1,1], "Stero Line")
-lat_circles = Lat_circ(10, 0.5, 10)
-
-t1_lat_circles = list(map(lambda geo: mob_transf_T1(geo[0], geo[1]), lat_circles ))
-t2_lat_circles = list(map(lambda geo: mob_transf_invT2(geo[0], geo[1]), t1_lat_circles ))
-
-long_circles = Long_circ(10)
-t1_long_circles = list(map(lambda geo: mob_transf_T1(geo[0], geo[1]), long_circles ))
-t2_long_circles = list(map(lambda geo: mob_transf_invT2(geo[0], geo[1]), t1_long_circles ))
 
 
-eval_plots(long_circles,cl1='blue', cl2='blue' )
-eval_plots(lat_circles,cl1='purple', cl2='purple' )
-eval_plots(t2_lat_circles, cl1='black', cl2='black')
-eval_plots(t2_long_circles, cl1='green', cl2='green')
-#eval_plots(lat_circles,cl1='red', cl2='red' )
-#eval_plots(t1_lat_circles, cl1='purple', cl2='purple')
-#eval_plots(t2_lat_circles, cl1='green', cl2='green')
-plot_sphere(1,[0,0,0])
+# ax2d.axes.set_xlim(left=-2, right=2) 
+# ax2d.axes.set_ylim(bottom=-2, top=2) 
+# ax.axes.set_xlim3d(left=-1.5, right=1.5) 
+# ax.axes.set_ylim3d(bottom=-1.5, top=1.5) 
+# ax.axes.set_zlim3d(bottom=-1.5, top=1.5)
+# ax.set_box_aspect((1, 1, 1))
 
-
-ax2d.axes.set_xlim(left=-2, right=2) 
-ax2d.axes.set_ylim(bottom=-2, top=2) 
-ax.axes.set_xlim3d(left=-1.5, right=1.5) 
-ax.axes.set_ylim3d(bottom=-1.5, top=1.5) 
-ax.axes.set_zlim3d(bottom=-1.5, top=1.5)
-ax.set_box_aspect((1, 1, 1))
-
-custom_lines1 = [Line2D([0], [0], color='red', lw=4),
-                Line2D([0], [0], color='purple', lw=4),
-                Line2D([0], [0], color='green', lw=4)]
+# custom_lines1 = [Line2D([0], [0], color='red', lw=4),
+#                 Line2D([0], [0], color='purple', lw=4),
+#                 Line2D([0], [0], color='green', lw=4)]
             
-custom_lines2 = [Line2D([0], [0], color='blue', lw=4),
-                Line2D([0], [0], color='black', lw=4),
-                Line2D([0], [0], color='red', lw=4)
-                ]
+# custom_lines2 = [Line2D([0], [0], color='blue', lw=4),
+#                 Line2D([0], [0], color='black', lw=4),
+#                 Line2D([0], [0], color='red', lw=4)
+#                 ]
             
-custom_lines3 = [Line2D([0], [0], color='blue', lw=4),
-                Line2D([0], [0], color='purple', lw=4),
-                Line2D([0], [0], color='black', lw=4),
-                Line2D([0], [0], color='green', lw=4)
-                ]
+# custom_lines3 = [Line2D([0], [0], color='blue', lw=4),
+#                 Line2D([0], [0], color='purple', lw=4),
+#                 Line2D([0], [0], color='black', lw=4),
+#                 Line2D([0], [0], color='green', lw=4)
+#                 ]
 
-ax2d.legend(custom_lines3,["Longituted C","Latituted C", "Transf Long", "Transf Lat"], loc="upper right")
-ax.legend(custom_lines3,["Longituted C","Latituted C", "Transf Long", "Transf Lat"], loc="upper right")
+# ax2d.legend(custom_lines3,["Longituted C","Latituted C", "Transf Long", "Transf Lat"], loc="upper right")
+# ax.legend(custom_lines3,["Longituted C","Latituted C", "Transf Long", "Transf Lat"], loc="upper right")
 
+# pts = []
 
-
-
-plt.show()
+# for t in range(10):
+#     x, y = func(t)
+#     x_lst, y_lst =  bluchke_to_euc(lag_to_bluchke(x,y)[0], lag_to_bluchke(x,y)[1], lag_to_bluchke(x,y)[2])
+#     ax2d.plot(x_lst, y_lst)
+# ax2d.set_xlim(-10,10)
+# ax2d.set_ylim(-10,10)
+# plt.show()
+a, b, t = sym.symbols('a b t')
+x = t ** 2
+y = t
+print(curve(x, y)[0].subs(t, 0.5), curve(x, y)[1].subs(t, 0.5))
