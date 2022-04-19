@@ -1,3 +1,4 @@
+from cProfile import run
 from ctypes.wintypes import RGB
 from symtable import Symbol
 import matplotlib.pyplot as plt
@@ -283,7 +284,6 @@ def center_c(p1, p2, p3):
     cx = (bc*(p2[1] - p3[1]) - cd*(p1[1] - p2[1])) / det
     cy = ((p1[0] - p2[0]) * cd - (p2[0] - p3[0]) * bc) / det
 
-    radius = np.sqrt((cx - p1[0])**2 + (cy - p1[1])**2)
     return cx, cy
 
 def evalue(lst):
@@ -293,6 +293,13 @@ def evalue(lst):
         eval.append(center)
     return eval
 
+def eval_func_ls(func, ti, tf, n, *args):
+    ls_t = np.linspace(ti, tf, n)
+    pts = []
+    for t0 in ls_t:
+        pt = list(map(lambda point:  point.subs(t, t0),  func(*args) ))
+        pts.append(pt)     
+    return pts
 
 
 A1 = [1,2]
@@ -375,4 +382,6 @@ ax2d = fig2.add_subplot()
 a, b, t = sym.symbols('a b t')
 x = t ** 2
 y = t
-print(curve_ofset(x, y, 1)[0].subs(t, 0.5), curve_ofset(x, y, 1)[1].subs(t, 0.5))
+
+ls = eval_func_ls(curve_ofset, 1, 2, 5, x, t, 1)
+print(ls)
